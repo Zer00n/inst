@@ -17,6 +17,7 @@ pip install shadowsocks
 cp -r /home/soft/shadowsocks.json /etc/shadowsocks.json       //写好配置文件1
 nohup sslocal -c /etc/shadowsocks.json /dev/null 2>&1 &
 echo " nohup sslocal -c /etc/shadowsocks.json /dev/null 2>&1 &" /etc/rc.local    //开机运行
+ps aux |grep sslocal |grep -v "grep"    //检查进程
 
 sed '$a forward-socks5t / 127.0.0.1:1080' /etc/privoxy/config
 systemctl enable privoxy
@@ -31,6 +32,10 @@ export https_proxy=http://$PROXY_HOST:8118
 export no_proxy=localhost,172.16.0.0/16,192.168.0.0/16.,127.0.0.1,10.10.0.0/16' /etc/profile
 
 source /etc/profile
+//单台开放代理端口，其他机器http代理即可
+firewall-cmd --zone=public --add-port=1080/tcp --permanent
+firewall-cmd --zone=public --add-port=8118/tcp --permanent
+firewall-cmd --reload
 
 
 //监控安装
@@ -48,6 +53,20 @@ systemctl start zabbix-agent.service
 -A INPUT -s 192.168.1.10 -p tcp -m state --state NEW -m tcp --dport 10050 -j ACCEPT
 #systemctl restart iptables
 
+
+//安装docker1.13.1
+
+sudo yum-config-manager \
+    --add-repo \
+    https://docs.docker.com/v1.13/engine/installation/linux/repo_files/centos/docker.repo
+yum list docker-engine.x86_64  --showduplicates |sort -r
+
+yum -y install docker-engine-1.13.1
+
+systemctl enable docker # 开机自动启动docker
+systemctl start docker # 启动docker
+
+//加入私有源
 
 
 

@@ -1,0 +1,54 @@
+//基础配置
+yum install epel-release
+yum localinstall -y http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
+yum install -y yum-utils
+yum-config-manager \
+    --add-repo \
+    https://docs.docker.com/v1.13/engine/installation/linux/repo_files/centos/docker.repo
+yum clean all
+yum makecache
+
+yum update
+
+//代理安装
+yum install -y python-pip
+yum install privoxy -y
+pip install shadowsocks
+cp -r /home/soft/shadowsocks.json /etc/shadowsocks.json       //写好配置文件1
+nohup sslocal -c /etc/shadowsocks.json /dev/null 2>&1 &
+echo " nohup sslocal -c /etc/shadowsocks.json /dev/null 2>&1 &" /etc/rc.local    //开机运行
+
+sed '$a forward-socks5t / 127.0.0.1:1080' /etc/privoxy/config
+systemctl enable privoxy
+systemctl start privoxy
+systemctl status privoxy
+
+sed '$a PROXY_HOST=127.0.0.1 
+export all_proxy=http://$PROXY_HOST:8118 
+export ftp_proxy=http://$PROXY_HOST:8118 
+export http_proxy=http://$PROXY_HOST:8118 
+export https_proxy=http://$PROXY_HOST:8118 
+export no_proxy=localhost,172.16.0.0/16,192.168.0.0/16.,127.0.0.1,10.10.0.0/16' /etc/profile
+
+source /etc/profile
+
+
+//监控安装
+yum install -y zabbix-agent
+cp -r /home/soft/zabbix_agentd.conf /etc/zabbix/zabbix_agentd.conf      //写好的配置文件2
+
+systemctl enable zabbix-agent.service
+systemctl start zabbix-agent.service
+
+
+//防火墙配置
+
+
+#vim /etc/sysconfig/iptables                       #设置防火墙，对zabbix服务器开放10050端口
+-A INPUT -s 192.168.1.10 -p tcp -m state --state NEW -m tcp --dport 10050 -j ACCEPT
+#systemctl restart iptables
+
+
+
+
+

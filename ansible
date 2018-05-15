@@ -1,0 +1,17 @@
+//安装yum
+需要epel
+yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+
+yum install ansible
+
+//ssh免密码登录
+yum -y install openssh-clients
+ssh-keygen 
+ssh-copy-id 192.168.1.103
+scp -rp /root/.ssh/* 192.168.1.103:/root/.ssh
+
+主要用它做什么?
+
+
+
+

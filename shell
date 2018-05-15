@@ -45,6 +45,10 @@ cp -r /home/soft/zabbix_agentd.conf /etc/zabbix/zabbix_agentd.conf      //写好
 systemctl enable zabbix-agent.service
 systemctl start zabbix-agent.service
 
+//监控安装yum
+yum -y install gcc gcc-c++ ncurses-devel make cmake  pcre*
+./configure -prefix=/usr/local/zabbix –enable-agent
+
 
 //防火墙配置
 
